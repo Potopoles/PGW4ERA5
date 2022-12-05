@@ -13,12 +13,12 @@ authors		Before 2022: original developments by Roman Brogli
 # debug output level
 i_debug = 2 # [0-2]
 
-# Input and output file naming convention for the CTRL and climate delta
-# (SCEN-CTRL) files from the GCM.
+# Input and output file naming convention for the HIST and climate delta
+# (SCEN-HIST) files from the GCM.
 # ({} is placeholder for variable name).
 file_name_bases = {
-    'SCEN-CTRL':    '{}_delta.nc',
-    'CTRL':         '{}_historical.nc',
+    'SCEN-HIST':    '{}_delta.nc',
+    'HIST':         '{}_historical.nc',
 }
 
 # File naming convention for ERA5 files to be read in and written out.

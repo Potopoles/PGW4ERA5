@@ -24,15 +24,15 @@ from settings import (
 parser = argparse.ArgumentParser(description =
             'PGW for ERA5: Preprocess GCM data before modifying ' +
             'the ERA5 files. The main PGW routine (step_03_apply_to_era.py) ' +
-            'requires GCM climate delta files (SCEN-CTRL) for ' +
+            'requires GCM climate delta files (SCEN-HIST) for ' +
             'ta,hur,ua,va,zg,hurs,tas as well ' +
-            'as the GCM CTRL climatology file for ps. This script here by ' +
-            'default preprocesses both the SCEN-CTRL and CTRL files ' +
+            'as the GCM HIST climatology file for ps. This script here by ' +
+            'default preprocesses both the SCEN-HIST and HIST files ' +
             'for the variables it is run for. Both are thus required for ' +
             'every variable being processed. The script ' +
             'looks for the inputs files using the naming convention ' +
             '${var_name}_${file_name_base}.nc, where the ${file_name_base} ' +
-            'for the SCEN-CTRL and the CTRL files ' +
+            'for the SCEN-HIST and the HIST files ' +
             'can be set in settings.py, among other things. If this script ' +
             'is used to preprocess daily GCM data, one can run it twice and '+
             'store the intermediate results: once '+
@@ -60,7 +60,7 @@ parser.add_argument('processing_step', type=str,
 
 # input directory
 parser.add_argument('-i', '--input_dir', type=str,
-            help='Directory with input GCM data files (SCEN-CTRL, CTRL) ' +
+            help='Directory with input GCM data files (SCEN-HIST, HIST) ' +
             'for selected processing step.')
 
 # output directory
@@ -106,9 +106,13 @@ print('Run {} for variable names {}.'.format(
 # iterate over all variables to preprocess
 for var_name in var_names:
     print(var_name)
+    if var_name == 'ps':
+        clim_periods = ['HIST','SCEN-HIST']
+    else:
+        clim_periods = ['SCEN-HIST']
     # iterate over the two types of GCM data files
-    # (CTRL and SCEN-CTRL)
-    for clim_period in ['CTRL', 'SCEN-CTRL']:
+    # (HIST and SCEN-HIST)
+    for clim_period in clim_periods:
 
         var_file_name = file_name_bases[clim_period].format(var_name)
 
