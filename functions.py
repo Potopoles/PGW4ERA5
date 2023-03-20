@@ -827,14 +827,14 @@ def regrid_lat_lon(ds_gcm, ds_era5, var_name,
             ds_gcm = ds_gcm.reindex(
                     {LAT_GCM:list(reversed(ds_gcm[LAT_GCM]))})
 
-        ## If GCM dataset reaches poles (almost), add a pole grid point
+        ## If GCM dataset almost reaches poles, add a pole grid point
         ## with the zonal average of the values closest to the pole
-        if np.max(targ_lat.values) + dlat_gcm > 89.9:
+        if (np.max(targ_lat.values) + dlat_gcm > 89.9) and ds_gcm[LAT_GCM].max()<90.0 :
             north = ds_gcm.isel({LAT_GCM:-1})
             north[LAT_GCM].values = 90
             north[var_name] = north[var_name].mean(dim=[LON_GCM])
             ds_gcm = xr.concat([ds_gcm,north], dim=LAT_GCM)
-        if np.min(targ_lat.values) - dlat_gcm < -89.9:
+        if (np.min(targ_lat.values) - dlat_gcm < -89.9) and ds_gcm[LAT_GCM].min()>-90.0 :
             south = ds_gcm.isel({LAT_GCM:0})
             south[LAT_GCM].values = -90
             south[var_name] = south[var_name].mean(dim=[LON_GCM])
@@ -853,7 +853,6 @@ def regrid_lat_lon(ds_gcm, ds_era5, var_name,
                               'than GCM dataset!. Perhaps consider using ' +
                               'ERA5 on a subdomain only if global coverage ' +
                               'is not required?') 
-
         ## run interpolation
         ds_gcm = ds_gcm.interp({LAT_GCM:targ_lat})
 
