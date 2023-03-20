@@ -863,13 +863,13 @@ def regrid_lat_lon(ds_gcm, ds_era5, var_name,
         ### This is also a check and fix for a different longitude format 
         ### e.g. GCM -180:180 while ERA5 0:360 (or vice versa)
         if periodic_lon:
+        
+            lon_above = ds_gcm.assign_coords({LON_GCM:ds_gcm[LON_GCM] + 360}).isel({LON_GCM:0})
+            lon_below = ds_gcm.assign_coords({LON_GCM:ds_gcm[LON_GCM] - 360}).isel({LON_GCM:-1})
+
             if np.max(targ_lon.values) > np.max(ds_gcm[LON_GCM].values):
-                lon_above = ds_gcm.assign_coords(
-                            {LON_GCM:ds_gcm[LON_GCM] + 360})
                 ds_gcm = xr.concat([ds_gcm, lon_above], dim=LON_GCM)
             if np.min(targ_lon.values) < np.min(ds_gcm[LON_GCM].values):
-                lon_below = ds_gcm.assign_coords(
-                            {LON_GCM:ds_gcm[LON_GCM] - 360})
                 ds_gcm = xr.concat([lon_below, ds_gcm], dim=LON_GCM)
 
         ## make sure there is no extrapolation to the East and West
