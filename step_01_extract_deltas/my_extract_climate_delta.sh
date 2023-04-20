@@ -57,12 +57,19 @@ done
 # USER SETTINGS
 ##############################################################################
 # base directory where cmip6 data is stored
-cmip_data_dir=/path/to/cmip6/data
+cmip_data_dir=/home/dargueso/BDY_DATA/CMIP6/PGW4ERA/
 # base directory where output should be stored
-out_base_dir=/path/to/processed/climate/deltas
+out_base_dir=/home/dargueso/BDY_DATA/CMIP6/PGW4ERA/Clim_Deltas
+
+filename=$2
 
 # name of the GCM to extract data for
-gcm_name=MPI-ESM1-2-HR
+
+while read line; do
+
+echo "GCM: $line"
+gcm_name=$line
+
 
 ## CMIP experiments to use to compute climate deltas
 ## --> climate delta = future climatology - ERA climatology
@@ -109,8 +116,7 @@ fi
 
 ## select variables to extract
 if [[ "$table_ID" == "Amon" ]]; then
-    var_names=(ts psl)
-    #var_names=(tas hurs ps ua va ta hur zg)
+    var_names=(ts psl tas hurs vas uas ps ua va ta hur zg)
 elif [[ "$table_ID" == "day" ]]; then
     var_names=(tas hurs ps ua va ta hur zg)
 elif [[ "$table_ID" == "Emon" ]]; then
@@ -178,10 +184,10 @@ for var_name in ${var_names[@]}; do
         if [[ $i_extract_vars == 1 ]]; then
 
             # data folder hierarchy for CMIP6
-            inp_dir=$cmip_data_dir/$experiment/$table_ID/$var_name/$gcm_name/r1i1p1f1/gn
+            inp_dir=$cmip_data_dir/$experiment/$table_ID/$var_name/$gcm_name
 
             # start of the CMIP6 file names
-            file_name_base=${table_ID}_${gcm_name}_${experiment}_r1i1p1f1_gn
+            file_name_base=${table_ID}_${gcm_name}_${experiment}
 
             ## overwrite old data
             #rm $out_dir/${var_name}_${experiment}.nc
@@ -192,8 +198,8 @@ for var_name in ${var_names[@]}; do
                 cdo sellonlatbox,$box \
                     -selyear,1985/2014 \
                     -cat \
-                    $inp_dir/${var_name}_${file_name_base}_19[8-9]*.nc \
-                    $inp_dir/${var_name}_${file_name_base}_20[0-1]*.nc \
+                    $inp_dir/${var_name}_${file_name_base}_*.nc \
+                    $inp_dir/${var_name}_${file_name_base}_*.nc \
                     $out_dir/${var_name}_${experiment}_full.nc
 
             ## compute future experiment climatology
@@ -202,7 +208,7 @@ for var_name in ${var_names[@]}; do
                 cdo sellonlatbox,$box \
                     -selyear,2070/2099 \
                     -cat \
-                    $inp_dir/${var_name}_${file_name_base}_20[6-9]*.nc \
+                    $inp_dir/${var_name}_${file_name_base}_*.nc \
                     $out_dir/${var_name}_${experiment}_full.nc
             fi
 
@@ -247,6 +253,7 @@ for var_name in ${var_names[@]}; do
     fi
 
 done
+done < $filename
 
 # link surface fields from Amon because they are not available
 # in Emon
